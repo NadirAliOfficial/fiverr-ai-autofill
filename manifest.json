@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Fiverr Gig AI Autofill",
+  "version": "1.0.0",
+  "description": "AI-powered autofill for Fiverr gig titles, descriptions, packages, and FAQs using Groq.",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": [
+    "https://www.fiverr.com/*",
+    "https://api.groq.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.fiverr.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,135 @@
+#fai-panel {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 999999;
+  width: 300px;
+  background: #1a1a2e;
+  border: 1px solid #16213e;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #e0e0e0;
+  overflow: hidden;
+  user-select: none;
+}
+
+#fai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #0f3460;
+  cursor: grab;
+  border-radius: 12px 12px 0 0;
+}
+
+#fai-header:active {
+  cursor: grabbing;
+}
+
+#fai-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #fff;
+}
+
+#fai-toggle {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+#fai-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+}
+
+#fai-topic {
+  width: 100%;
+  box-sizing: border-box;
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 12px;
+  padding: 8px 10px;
+  resize: vertical;
+  min-height: 70px;
+  outline: none;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+#fai-topic:focus {
+  border-color: #1a73e8;
+}
+
+#fai-topic::placeholder {
+  color: #555;
+}
+
+#fai-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.fai-btn {
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 7px;
+  color: #c0c0c0;
+  font-size: 11.5px;
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  font-family: inherit;
+}
+
+.fai-btn:hover:not(:disabled) {
+  background: #0f3460;
+  color: #fff;
+  border-color: #1a73e8;
+}
+
+.fai-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.fai-btn-all {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  border-color: #1a73e8;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px;
+  font-size: 12.5px;
+}
+
+.fai-btn-all:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1565c0, #0a3470);
+  border-color: #1565c0;
+}
+
+#fai-status {
+  font-size: 11px;
+  min-height: 16px;
+  text-align: center;
+  border-radius: 5px;
+  padding: 4px 8px;
+}
+
+.fai-status-loading { color: #90caf9; }
+.fai-status-success { color: #a5d6a7; }
+.fai-status-error   { color: #ef9a9a; }
+.fai-status-info    { color: #b0bec5; }

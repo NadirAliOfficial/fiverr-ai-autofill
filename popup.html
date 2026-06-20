@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 280px;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 18px;
+    }
+    h2 {
+      font-size: 14px;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    label {
+      font-size: 11px;
+      color: #90a4ae;
+      display: block;
+      margin-bottom: 5px;
+    }
+    input {
+      width: 100%;
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 7px;
+      color: #e0e0e0;
+      font-size: 12px;
+      padding: 8px 10px;
+      outline: none;
+      font-family: inherit;
+    }
+    input:focus { border-color: #1a73e8; }
+    button {
+      width: 100%;
+      margin-top: 12px;
+      background: linear-gradient(135deg, #1a73e8, #0d47a1);
+      border: none;
+      border-radius: 7px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    button:hover { opacity: 0.9; }
+    #status {
+      font-size: 11px;
+      text-align: center;
+      margin-top: 8px;
+      min-height: 14px;
+      color: #a5d6a7;
+    }
+    .hint {
+      font-size: 10.5px;
+      color: #546e7a;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+    a { color: #1a73e8; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h2>⚡ Gig AI Autofill</h2>
+  <label>Groq API Key</label>
+  <input type="password" id="apiKey" placeholder="gsk_..." />
+  <button id="save">Save Key</button>
+  <div id="status"></div>
+  <p class="hint">
+    Get a free API key at <a href="https://console.groq.com" target="_blank">console.groq.com</a><br>
+    The panel appears automatically on Fiverr gig create/edit pages.
+  </p>
+  <script src="popup.js"></script>
+</body>
+</html>
