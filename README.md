@@ -1,91 +1,73 @@
-# ⚡ Fiverr Gig AI Autofill
+# Fiverr Gig AI Autofill
 
-A Chrome extension that uses **Groq AI** to instantly generate and autofill your Fiverr gig — title, description, pricing packages, and FAQs — with one click.
+A Chrome extension that uses **Groq AI** to generate and autofill your Fiverr gig — title, tags, packages, description, FAQs, and buyer requirements — page by page.
 
 ![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-green?style=for-the-badge)
-![Groq AI](https://img.shields.io/badge/Powered%20by-Groq%20AI-orange?style=for-the-badge)
+![Groq AI](https://img.shields.io/badge/Groq-llama--3.3--70b-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
 ---
 
 ## Features
 
-- **AI-Generated Gig Title** — Compelling "I will..." titles under 80 characters
-- **Professional Description** — Structured descriptions with hooks, bullet points, and CTAs
-- **3-Tier Packages** — Auto-generated Basic, Standard, and Premium package details with pricing
-- **FAQ Generation** — 4 buyer-focused Q&A pairs tailored to your gig niche
-- **Fill All at Once** — One button fills every field on the page
-- **Draggable Floating Panel** — Non-intrusive, stays out of your way
-- **Works on SPA Navigation** — Follows Fiverr's multi-step gig editor across all tabs
-
----
-
-## Demo
-
-> Open any Fiverr gig create or edit page → the **⚡ Gig AI Fill** panel appears in the top-right corner.
-
-1. Type your gig niche/topic
-2. Click a field button or **✨ Fill All**
-3. Watch your gig write itself
+- **AI-Generated Title** — Compelling "I will..." titles under 80 characters
+- **Auto Tags** — 5 relevant gig tags typed naturally into Fiverr's tag input
+- **3-Tier Packages** — Basic / Standard / Premium with names, descriptions, and prices
+- **Formatted Description** — Hook + bullets + CTA, 1000–1200 chars, injected into Fiverr's Quill editor
+- **5 FAQs** — Unique buyer-focused Q&A pairs, auto-added one by one
+- **Buyer Requirements** — Auto-fills the requirements textarea and marks it required
+- **Human-like Typing** — Character-by-character input with natural delays (anti-detection)
+- **Toggle On/Off** — Hide all AI buttons from the page with one switch in the popup
+- **Multi-key Rotation** — Add up to 3 Groq API keys; auto-rotates on rate limit
 
 ---
 
 ## Installation
 
-### Load Unpacked (Developer Mode)
-
-1. Clone or download this repository
+1. Clone this repository
    ```bash
    git clone https://github.com/NadirAliOfficial/fiverr-ai-autofill.git
    ```
 
-2. Open Chrome and go to `chrome://extensions`
+2. Open Chrome → `chrome://extensions`
 
-3. Enable **Developer mode** (toggle in the top-right)
+3. Enable **Developer mode** (top-right toggle)
 
-4. Click **Load unpacked** and select the `fiverr-ai-autofill` folder
+4. Click **Load unpacked** → select the `fiverr-ai-autofill` folder
 
-5. The extension icon will appear in your Chrome toolbar
+5. The ✦ icon appears in your Chrome toolbar
 
 ---
 
 ## Setup
 
-### Get a Free Groq API Key
+1. Click the extension icon to open the popup
+2. Go to the **API Keys** tab
+3. Paste your Groq API key (get one free at [console.groq.com](https://console.groq.com))
+4. Click **◆ Save Keys**
 
-1. Go to [console.groq.com](https://console.groq.com)
-2. Sign up / log in
-3. Navigate to **API Keys** → Create a new key
-4. Copy the key (starts with `gsk_...`)
-
-### Add Key to Extension
-
-1. Click the **⚡ Gig AI Fill** extension icon in Chrome
-2. Paste your Groq API key
-3. Click **Save Key**
+No config files needed — everything is stored in the extension's secure storage.
 
 ---
 
-## Usage
+## How to Use
 
-1. Go to [fiverr.com](https://www.fiverr.com) and open any gig create or edit page
-2. The floating panel appears automatically in the top-right corner
-3. Enter a short description of your gig in the text area
+1. Open the popup → **Keywords** tab → type your gig niche
+   > Example: `ibkr bot, python, algo trading, metatrader`
+2. Click **◆ Save Keywords**
+3. Go to Fiverr → **Selling → Gigs → Create a New Gig**
+4. On each page you'll see small **◆ Generate** buttons next to each field
+5. Click them to generate and autofill — review, then **Save & Continue**
 
-   > Example: *"I will design a professional logo for your brand using Adobe Illustrator"*
+### Pages Supported
 
-4. Click the button for what you want to generate:
-
-| Button | What It Fills |
+| Page | Fields Filled |
 |---|---|
-| 📝 **Title** | Gig title (max 80 chars, "I will..." format) |
-| 📄 **Description** | Full professional gig description |
-| 📦 **Packages** | Basic / Standard / Premium names, descriptions, prices |
-| ❓ **FAQs** | 4 common buyer question & answer pairs |
-| ✨ **Fill All** | Everything above in one shot |
-
-5. Review the generated content and make any edits before publishing
+| Overview | Title + 5 Tags |
+| Pricing | Package names, descriptions, prices |
+| Description & FAQ | Formatted description + 5 FAQs |
+| Requirements | Buyer requirements textarea |
 
 ---
 
@@ -93,12 +75,12 @@ A Chrome extension that uses **Groq AI** to instantly generate and autofill your
 
 ```
 fiverr-ai-autofill/
-├── manifest.json        # Chrome Extension Manifest V3 config
-├── background.js        # Service worker — handles Groq API requests
-├── content.js           # Injected into Fiverr pages — panel UI + field filling
-├── styles.css           # Floating panel styles
-├── popup.html           # Extension popup — API key input
-├── popup.js             # Popup logic — save/load API key
+├── manifest.json     # MV3 config
+├── background.js     # Service worker — Groq API calls, key rotation
+├── content.js        # Injected into Fiverr — generate buttons + field filling
+├── styles.css        # Field button styles
+├── popup.html        # Popup UI — Keywords, API Keys, Model tabs
+├── popup.js          # Popup logic
 └── icons/
     ├── icon16.png
     ├── icon48.png
@@ -110,28 +92,17 @@ fiverr-ai-autofill/
 ## How It Works
 
 ```
-User types gig topic
-       ↓
-content.js builds a prompt
-       ↓
-Sends message to background.js (service worker)
-       ↓
+User saves keywords in popup
+        ↓
+◆ Generate button clicked on Fiverr page
+        ↓
+content.js builds a prompt with the keywords
+        ↓
 background.js calls Groq API (llama-3.3-70b-versatile)
-       ↓
-Response parsed and injected into Fiverr's DOM fields
-(React synthetic events triggered so Fiverr registers the changes)
+        ↓
+Response is typed character-by-character into Fiverr's fields
+(React-compatible events fired so Fiverr registers real input)
 ```
-
-The extension uses **React-compatible DOM injection** — it triggers native `input`, `change`, and `blur` events so Fiverr's React frontend recognizes the filled values as real user input.
-
----
-
-## Supported Fiverr Pages
-
-- `fiverr.com/new-gig` — New gig creation
-- `fiverr.com/users/*/manage_gigs/*/edit` — Existing gig editing
-
-The panel auto-appears on these pages and hides on all other Fiverr pages.
 
 ---
 
@@ -140,17 +111,17 @@ The panel auto-appears on these pages and hides on all other Fiverr pages.
 | Layer | Tech |
 |---|---|
 | Extension | Chrome MV3, Vanilla JS |
-| AI Model | Groq — `llama-3.3-70b-versatile` |
-| API | Groq Cloud API (OpenAI-compatible) |
+| AI | Groq Cloud — `llama-3.3-70b-versatile` |
 | Styling | Pure CSS, dark theme |
+| Storage | `chrome.storage.sync` (keys) + `chrome.storage.local` (keywords/settings) |
 
 ---
 
 ## Notes
 
-- Your API key is stored locally in `chrome.storage.sync` — never sent anywhere except directly to Groq's API
-- Groq's free tier is generous — hundreds of requests per day at no cost
-- If a field isn't found, the extension will show a hint telling you which tab to navigate to in Fiverr's gig editor
+- API keys are stored in `chrome.storage.sync` — only sent directly to `api.groq.com`, never anywhere else
+- Groq's free tier handles hundreds of requests per day at no cost
+- The toggle in the popup lets you hide all AI buttons if you want a clean Fiverr experience
 
 ---
 
@@ -162,4 +133,4 @@ MIT — free to use, modify, and distribute.
 
 ## Author
 
-Built by [NadirAliOfficial](https://github.com/NadirAliOfficial)
+Built by [Nadir Ali Khan](https://www.theteamnak.com) · [GitHub](https://github.com/NadirAliOfficial)
