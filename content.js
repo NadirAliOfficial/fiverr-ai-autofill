@@ -15,15 +15,12 @@ async function humanType(el, text) {
   el.focus();
   await sleep(rand(80, 200));
 
-  // Clear existing value naturally
-  el.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', ctrlKey: true, bubbles: true }));
-  await sleep(rand(30, 80));
-  el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }));
-  await sleep(rand(30, 60));
-
-  // Use native setter so React tracks the value, then type char by char for events
+  // Clear existing value via native setter first (keyboard events alone don't clear React state)
   const proto = el.tagName === 'INPUT' ? HTMLInputElement.prototype : HTMLTextAreaElement.prototype;
   const nativeSetter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+  nativeSetter ? nativeSetter.call(el, '') : (el.value = '');
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  await sleep(rand(60, 140));
 
   let current = '';
   for (const char of text) {
@@ -214,11 +211,12 @@ const PAGE2 = {
       `Keywords: ${kw}`,
       `You are a top-rated Fiverr seller. Create 3 pricing packages. Return ONLY valid JSON:
 {
-  "basic":    { "name": "Basic",    "description": "one short sentence max 80 chars", "price": 30  },
-  "standard": { "name": "Standard", "description": "one short sentence max 80 chars", "price": 75  },
-  "premium":  { "name": "Premium",  "description": "one short sentence max 80 chars", "price": 150 }
+  "basic":    { "name": "Basic",    "description": "...", "price": 30  },
+  "standard": { "name": "Standard", "description": "...", "price": 75  },
+  "premium":  { "name": "Premium",  "description": "...", "price": 150 }
 }
-Description rules: max 80 characters, one sentence only, mention the key deliverable.
+STRICT description rules: MAXIMUM 90 characters each, single sentence, mention key deliverable only.
+COUNT the characters before writing — if over 90, shorten it.
 Prices must be realistic for: ${kw}. No markdown, no explanation, only the JSON object.`
     );
 
@@ -242,7 +240,8 @@ Prices must be realistic for: ${kw}. No markdown, no explanation, only the JSON 
         await humanDelay();
       }
       if (descFields[i]) {
-        await humanType(descFields[i], pkg.description.slice(0, 80));
+        const desc = pkg.description.trim().slice(0, 99);
+        await humanType(descFields[i], desc);
         await humanDelay();
       }
       if (priceFields[i]) {
