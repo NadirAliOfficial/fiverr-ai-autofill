@@ -218,41 +218,79 @@ function injectPage3() {
     toolbar.dataset.faiDone = '1';
     const btn = makeBtn('⚡ Generate Description', async (kw) => {
       setMsg('Generating description…', 'info');
-      const text = await ask(`Keywords: ${kw}`,
-        `Write a professional Fiverr gig description. Plain text only — no HTML, no markdown, no asterisks, no bullet dashes.
-Use this exact structure with blank lines between sections:
-
-[2-3 sentence opening hook about the value and outcome you deliver]
-
-What You Get:
-✅ [specific deliverable 1]
-✅ [specific deliverable 2]
-✅ [specific deliverable 3]
-✅ [specific deliverable 4]
-✅ [specific deliverable 5]
-✅ [specific deliverable 6]
-
-Why Choose Me:
-[3 sentences about your experience, quality of work, fast delivery, and support]
-
-[Strong 1-sentence call to action to message you]
-
-TARGET: 1000-1100 characters total. Count carefully — must be between 1000 and 1100 chars. Plain text only.`
+      const data = await ask(`Keywords: ${kw}`,
+        `Write a professional Fiverr gig description. Return ONLY valid JSON:
+{
+  "hook": "2-3 sentence opening about the value and outcome you deliver (150-200 chars)",
+  "bullets": [
+    "specific deliverable 1 (no emoji, plain text)",
+    "specific deliverable 2",
+    "specific deliverable 3",
+    "specific deliverable 4",
+    "specific deliverable 5",
+    "specific deliverable 6"
+  ],
+  "why": "3 sentences about experience, quality, fast delivery, support (200-250 chars)",
+  "cta": "One strong sentence asking them to message you now"
+}
+Be specific to: ${kw}. JSON only, no markdown.`
       );
+
+      let desc;
+      try { desc = JSON.parse(data.match(/\{[\s\S]*\}/)?.[0]); }
+      catch { throw new Error('Could not parse description — try again'); }
 
       editor.click();
       editor.focus();
       await sleep(rand(200, 350));
 
-      // Clear existing content
+      // Clear
       document.execCommand('selectAll', false, null);
-      await sleep(rand(60, 120));
+      await sleep(rand(60, 100));
       document.execCommand('delete', false, null);
-      await sleep(rand(100, 180));
+      await sleep(rand(80, 150));
 
-      // Insert full text in one shot — avoids Quill paragraph-mode issues
-      document.execCommand('insertText', false, text.trim());
-      await sleep(rand(150, 250));
+      // Hook (plain paragraph)
+      document.execCommand('insertText', false, desc.hook);
+      await sleep(rand(80, 140));
+      document.execCommand('insertParagraph', false, null);
+      document.execCommand('insertParagraph', false, null);
+      await sleep(rand(60, 100));
+
+      // "What You Get:" in bold
+      document.execCommand('bold', false, null);
+      document.execCommand('insertText', false, 'What You Get:');
+      document.execCommand('bold', false, null);
+      document.execCommand('insertParagraph', false, null);
+      await sleep(rand(60, 100));
+
+      // Bullet list
+      document.execCommand('insertUnorderedList', false, null);
+      await sleep(rand(60, 100));
+      for (const bullet of desc.bullets) {
+        document.execCommand('insertText', false, bullet);
+        await sleep(rand(40, 80));
+        document.execCommand('insertParagraph', false, null);
+        await sleep(rand(40, 80));
+      }
+      // Exit list
+      document.execCommand('insertUnorderedList', false, null);
+      await sleep(rand(60, 100));
+      document.execCommand('insertParagraph', false, null);
+
+      // "Why Choose Me:" in bold
+      document.execCommand('bold', false, null);
+      document.execCommand('insertText', false, 'Why Choose Me:');
+      document.execCommand('bold', false, null);
+      document.execCommand('insertParagraph', false, null);
+      document.execCommand('insertText', false, desc.why);
+      document.execCommand('insertParagraph', false, null);
+      document.execCommand('insertParagraph', false, null);
+      await sleep(rand(60, 100));
+
+      // CTA
+      document.execCommand('insertText', false, desc.cta);
+      await sleep(rand(80, 140));
 
       setMsg('Description filled!', 'success');
     });
@@ -270,7 +308,14 @@ TARGET: 1000-1100 characters total. Count carefully — must be between 1000 and
     const btn = makeBtn('⚡ Generate FAQs', async (kw) => {
       setMsg('Generating FAQs…', 'info');
       const raw = await ask(`Keywords: ${kw}`,
-        `Write 5 FAQs for a Fiverr gig. Return ONLY valid JSON array:
+        `Write exactly 5 UNIQUE FAQs for a Fiverr gig about: ${kw}
+Each question must cover a DIFFERENT topic. Use this exact topic order:
+1. Delivery time — how long does it take?
+2. Revisions — how many revisions are included?
+3. Tech stack — what tools/languages/platforms do you use?
+4. Source files — will they get source code or editable files?
+5. Communication — how do you keep the client updated?
+Return ONLY valid JSON array, no duplicates, no same question twice:
 [
   { "question": "...", "answer": "..." },
   { "question": "...", "answer": "..." },
@@ -278,8 +323,7 @@ TARGET: 1000-1100 characters total. Count carefully — must be between 1000 and
   { "question": "...", "answer": "..." },
   { "question": "...", "answer": "..." }
 ]
-Cover: revisions policy, delivery time, tech/tools used, source files, communication/support.
-Each answer must be under 270 characters. No duplicate questions. JSON only.`
+Each answer under 265 characters, specific to the gig. JSON only.`
       );
       let faqs;
       try { faqs = JSON.parse(raw.match(/\[[\s\S]*\]/)?.[0]); }
