@@ -215,8 +215,11 @@ const PAGE2 = {
   "standard": { "name": "Standard", "description": "...", "price": 75  },
   "premium":  { "name": "Premium",  "description": "...", "price": 150 }
 }
-STRICT description rules: MAXIMUM 90 characters each, single sentence, mention key deliverable only.
-COUNT the characters before writing — if over 90, shorten it.
+Description rules:
+- AIM for 65-90 characters — not less, not more than 99
+- One sentence, mention what is included (features, support level, scope)
+- Be specific to the gig, not generic
+- Example (85 chars): "Basic IBKR bot setup with entry/exit logic, backtesting, and email support included"
 Prices must be realistic for: ${kw}. No markdown, no explanation, only the JSON object.`
     );
 
