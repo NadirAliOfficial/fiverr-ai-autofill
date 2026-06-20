@@ -257,6 +257,83 @@ Prices must be realistic for: ${kw}. No markdown, no explanation, only the JSON 
   }
 };
 
+// ── Page 3: Description & FAQ (tab=description) ───────────────────────────────
+
+const PAGE3 = {
+  descEditor() {
+    return document.querySelector('.ql-editor[contenteditable="true"]');
+  },
+
+  addFaqBtn() {
+    return [...document.querySelectorAll('a, button, span')].find(el =>
+      /^\+?\s*Add FAQ$/i.test(el.textContent.trim())
+    );
+  },
+
+  async fillDescription(kw) {
+    const el = this.descEditor();
+    if (!el) throw new Error('Description editor not found — are you on the Description & FAQ tab?');
+    setMsg('Generating description…', 'info');
+    const text = await ask(
+      `Keywords: ${kw}`,
+      `You are a top-rated Fiverr seller. Write a professional gig description (max 1100 characters).
+Structure:
+- Opening hook: 1-2 sentences on the value you deliver
+- What's included: 4-6 bullet points starting with ✅
+- Why choose me: 2-3 short sentences (experience, quality, support)
+- Call to action: 1 sentence
+Use plain text only. No markdown headers. Keep total under 1100 characters.`
+    );
+    await humanTypeRich(el, text.slice(0, 1100));
+  },
+
+  async fillFAQs(kw) {
+    setMsg('Generating FAQs…', 'info');
+    const raw = await ask(
+      `Keywords: ${kw}`,
+      `Write 4 FAQ entries for a Fiverr gig. Return ONLY a valid JSON array:
+[
+  { "question": "short question?", "answer": "1-2 sentence answer" },
+  { "question": "short question?", "answer": "1-2 sentence answer" },
+  { "question": "short question?", "answer": "1-2 sentence answer" },
+  { "question": "short question?", "answer": "1-2 sentence answer" }
+]
+Cover: revisions policy, delivery time, tech stack used, communication/support. JSON only.`
+    );
+
+    let faqs;
+    try {
+      faqs = JSON.parse(raw.match(/\[[\s\S]*\]/)?.[0]);
+    } catch { throw new Error('Could not parse FAQs — try again'); }
+
+    for (let i = 0; i < faqs.length; i++) {
+      const faq = faqs[i];
+
+      // Click "+ Add FAQ" to reveal a new row
+      const addBtn = this.addFaqBtn();
+      if (!addBtn) { setMsg(`Only ${i} FAQs added — "+ Add FAQ" not found`, 'error'); break; }
+      addBtn.click();
+      await sleep(rand(600, 1000));
+
+      // Grab the last question/answer pair that appeared
+      const qInputs = [...document.querySelectorAll('input[placeholder*="question" i], input[placeholder*="Question"]')];
+      const aInputs = [...document.querySelectorAll('textarea[placeholder*="answer" i], textarea[placeholder*="Answer"]')];
+      const qEl = qInputs[qInputs.length - 1];
+      const aEl = aInputs[aInputs.length - 1];
+
+      if (qEl) { await humanType(qEl, faq.question); await humanDelay(); }
+      if (aEl) { await humanType(aEl, faq.answer);   await humanDelay(); }
+    }
+  },
+
+  async fillAll(kw) {
+    await this.fillDescription(kw);
+    await humanDelay();
+    await this.fillFAQs(kw);
+    setMsg('Page 3 done — review and Save & Continue', 'success');
+  }
+};
+
 // ── Bar & Buttons ─────────────────────────────────────────────────────────────
 
 function injectBar() {
@@ -302,6 +379,30 @@ function injectFieldButtons() {
       });
     });
   }
+
+  if (tab === 'description') {
+    const editor = PAGE3.descEditor();
+    if (editor && !editor.dataset.faiBtnDone) {
+      editor.dataset.faiBtnDone = '1';
+      const btn = document.createElement('button');
+      btn.className = 'fai-field-btn';
+      btn.textContent = '⚡ Description';
+      btn.style.marginBottom = '8px';
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const kw = getKeywords();
+        if (!kw) { setMsg('Enter keywords first', 'error'); return; }
+        btn.disabled = true; btn.textContent = '…';
+        try {
+          await PAGE3.fillDescription(kw);
+          setMsg('Description filled!', 'success');
+          btn.textContent = '✓';
+          setTimeout(() => { btn.textContent = '⚡ Description'; btn.disabled = false; }, 2000);
+        } catch(err) { setMsg(err.message, 'error'); btn.textContent = '⚡ Description'; btn.disabled = false; }
+      });
+      editor.closest('.ql-container')?.parentElement?.prepend(btn);
+    }
+  }
 }
 
 function injectBtn(el, label, onClickFn) {
@@ -340,8 +441,9 @@ async function runFillAll() {
   setLoading(true);
   try {
     const tab = getCurrentTab();
-    if (tab === 'general') await PAGE1.fillAll(kw);
-    else if (tab === 'pricing') await PAGE2.fillAll(kw);
+    if (tab === 'general')     await PAGE1.fillAll(kw);
+    else if (tab === 'pricing')     await PAGE2.fillAll(kw);
+    else if (tab === 'description') await PAGE3.fillAll(kw);
     else setMsg(`Send screenshot of this tab and I'll add support`, 'info');
   } catch (e) {
     setMsg(e.message, 'error');
