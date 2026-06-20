@@ -392,6 +392,107 @@ Each answer under 265 characters, specific to the gig. JSON only.`
   }
 }
 
+// ── Page 4: Requirements ─────────────────────────────────────────────────────
+
+function injectPage4() {
+  // Detect by the requirements textarea placeholder
+  const reqTextarea = document.querySelector('textarea[placeholder*="Request necessary details" i]');
+  const heading = [...document.querySelectorAll('h2,h3,h4,p,div,span')]
+    .find(el => el.children.length === 0 && /your questions/i.test(el.textContent.trim()));
+
+  const anchor = heading || reqTextarea;
+  if (!anchor || anchor.dataset.faiDone) return;
+  anchor.dataset.faiDone = '1';
+
+  const btn = makeBtn('⚡ Generate Requirements', async (kw) => {
+    setMsg('Generating requirements…', 'info');
+    const raw = await ask(`Keywords: ${kw}`,
+      `Write 3 buyer requirement questions for a Fiverr gig about: ${kw}
+These are questions the seller asks the buyer when they place an order.
+Return ONLY valid JSON array:
+[
+  { "question": "...", "required": true },
+  { "question": "...", "required": true },
+  { "question": "...", "required": false }
+]
+Rules:
+- Each question under 380 characters
+- Ask for: 1) project specs/details, 2) technical preferences/requirements, 3) timeline or extra info
+- Be specific to the gig type
+- required: true for essential info, false for optional
+JSON only.`
+    );
+
+    let reqs;
+    try { reqs = JSON.parse(raw.match(/\[[\s\S]*\]/)?.[0]); }
+    catch { throw new Error('Could not parse requirements — try again'); }
+
+    async function waitForReqForm(timeout = 5000) {
+      const start = Date.now();
+      while (Date.now() - start < timeout) {
+        const el = document.querySelector('textarea[placeholder*="Request necessary details" i]');
+        if (el && isVisible(el)) return el;
+        await sleep(200);
+      }
+      return null;
+    }
+
+    async function waitReqGone(timeout = 4000) {
+      const start = Date.now();
+      while (Date.now() - start < timeout) {
+        const el = document.querySelector('textarea[placeholder*="Request necessary details" i]');
+        if (!el || !isVisible(el)) return true;
+        await sleep(200);
+      }
+      return false;
+    }
+
+    for (let i = 0; i < reqs.length; i++) {
+      setMsg(`Adding requirement ${i + 1}/${reqs.length}…`, 'info');
+
+      // Wait for form to close if open from previous
+      if (i > 0) {
+        await waitReqGone(4000);
+        await sleep(rand(300, 500));
+
+        // Find and click "Add Question" / "+ Add" button to open next form
+        const addBtn = [...document.querySelectorAll('button, a, span')]
+          .find(el => /add (a )?question/i.test(el.textContent.trim()) && isVisible(el));
+        if (!addBtn) { setMsg(`"Add Question" button not found at req ${i + 1}`, 'error'); break; }
+        addBtn.click();
+        await sleep(rand(400, 700));
+      }
+
+      const textarea = await waitForReqForm(5000);
+      if (!textarea) { setMsg(`Requirement form not found at entry ${i + 1}`, 'error'); break; }
+
+      await sleep(rand(150, 300));
+      await humanType(textarea, reqs[i].question.slice(0, 380));
+      await humanDelay();
+
+      // Check "Required" if needed
+      if (reqs[i].required) {
+        const checkbox = document.querySelector('input[type="checkbox"]');
+        if (checkbox && !checkbox.checked) {
+          checkbox.click();
+          await sleep(rand(150, 300));
+        }
+      }
+
+      // Click "Add" to save
+      const saveBtn = [...document.querySelectorAll('button')]
+        .find(el => el.textContent.trim() === 'Add' && isVisible(el));
+      if (!saveBtn) { setMsg(`"Add" button not found at req ${i + 1}`, 'error'); break; }
+      saveBtn.click();
+      await sleep(rand(500, 800));
+    }
+    setMsg('Requirements added!', 'success');
+  });
+
+  if (heading) heading.after(btn);
+  else reqTextarea.closest('div')?.before(btn);
+}
+
 // ── Top bar ───────────────────────────────────────────────────────────────────
 
 function injectBar() {
@@ -414,6 +515,7 @@ function scanAndInject() {
   injectPage1();
   injectPage2();
   injectPage3();
+  injectPage4();
 }
 
 let debounce;
