@@ -505,6 +505,15 @@ function injectBar() {
     <span id="fai-msg"></span>
   `;
   document.body.prepend(bar);
+
+  // Restore saved keywords
+  const saved = sessionStorage.getItem('fai_keywords');
+  if (saved) document.getElementById('fai-keywords').value = saved;
+
+  // Save on every keystroke
+  document.getElementById('fai-keywords').addEventListener('input', function () {
+    sessionStorage.setItem('fai_keywords', this.value);
+  });
 }
 
 // ── Observe & inject ──────────────────────────────────────────────────────────
