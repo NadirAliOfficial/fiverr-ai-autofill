@@ -27,6 +27,31 @@ document.querySelectorAll('.eye-btn').forEach(btn => {
   });
 });
 
+// Rotating placeholder examples across different gig categories
+const KW_PLACEHOLDERS = [
+  "logo design, branding, vector art, business card",
+  "wordpress website, landing page, responsive design",
+  "python bot, automation, web scraping, api integration",
+  "video editing, youtube shorts, reels, motion graphics",
+  "seo articles, blog writing, copywriting, content creation",
+  "ibkr bot, algo trading, mt5, metatrader",
+  "shopify store, ecommerce, product listing, dropshipping",
+  "voiceover, podcast editing, audio cleanup",
+  "photoshop editing, photo retouching, background removal",
+  "mobile app, react native, flutter, ios android",
+];
+(function rotatePlaceholder() {
+  const ta = document.getElementById('fai-kw');
+  if (ta.value) return;
+  let i = 0;
+  ta.placeholder = KW_PLACEHOLDERS[0];
+  setInterval(() => {
+    if (ta.value) return;
+    i = (i + 1) % KW_PLACEHOLDERS.length;
+    ta.placeholder = KW_PLACEHOLDERS[i];
+  }, 2800);
+})();
+
 // Load all saved values
 chrome.storage.local.get(['faiKeywords', 'faiEnabled'], ({ faiKeywords, faiEnabled }) => {
   if (faiKeywords) document.getElementById('fai-kw').value = faiKeywords;
