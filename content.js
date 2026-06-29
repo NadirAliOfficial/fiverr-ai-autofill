@@ -392,21 +392,23 @@ function injectPage3() {
     const btn = makeBtn('◆ Generate Description', async (kw) => {
       setMsg('Generating description…', 'info');
       const data = await ask(`Keywords: ${kw}`,
-        `Write a professional Fiverr gig description. Naturally weave in these keywords throughout: ${kw}. Return ONLY valid JSON:
+        `Write a professional Fiverr gig description for: ${kw}.
+Total length must be ~900 characters including spaces across all sections combined.
+Return ONLY valid JSON:
 {
-  "hook": "2-3 sentence opening about value and outcome, include 1-2 keywords naturally (150-200 chars)",
+  "hook": "2-3 sentences, value + outcome, 1-2 keywords (180-200 chars)",
   "bullets": [
-    "specific deliverable 1 using relevant keyword (no emoji, plain text)",
-    "specific deliverable 2",
-    "specific deliverable 3",
-    "specific deliverable 4",
-    "specific deliverable 5",
-    "specific deliverable 6"
+    "specific deliverable with keyword (60-70 chars each)",
+    "specific deliverable",
+    "specific deliverable",
+    "specific deliverable",
+    "specific deliverable",
+    "specific deliverable"
   ],
-  "why": "3 sentences about experience, quality, fast delivery, support — include 1-2 keywords naturally (200-250 chars)",
-  "cta": "One strong sentence asking them to message you now"
+  "why": "2-3 sentences on experience, quality, delivery, support (180-200 chars)",
+  "cta": "One strong call-to-action sentence (60-80 chars)"
 }
-Keywords must appear naturally across hook, bullets, and why — not forced or repeated. Be specific to: ${kw}. JSON only, no markdown.`
+Aim so hook + bullets + why + cta totals ~900 chars. Weave keywords naturally. JSON only.`
       );
 
       let desc;
@@ -417,52 +419,52 @@ Keywords must appear naturally across hook, bullets, and why — not forced or r
       editor.focus();
       await sleep(rand(200, 350));
 
-      // Clear
+      // Helpers that use Quill toolbar buttons (more reliable than execCommand)
+      const qlBold   = () => document.querySelector('.ql-bold');
+      const qlBullet = () => document.querySelector('.ql-list[value="bullet"]');
+      const insert   = (text) => { editor.focus(); document.execCommand('insertText', false, text); };
+      const newLine  = () => document.execCommand('insertParagraph', false, null);
+
+      // Clear editor
       document.execCommand('selectAll', false, null);
-      await sleep(rand(60, 100));
+      await sleep(60);
       document.execCommand('delete', false, null);
-      await sleep(rand(80, 150));
+      await sleep(100);
 
-      // Hook (plain paragraph)
-      document.execCommand('insertText', false, desc.hook);
-      await sleep(rand(80, 140));
-      document.execCommand('insertParagraph', false, null);
-      document.execCommand('insertParagraph', false, null);
-      await sleep(rand(60, 100));
+      // Hook paragraph
+      insert(desc.hook);
+      newLine(); newLine();
+      await sleep(rand(80, 130));
 
-      // "What You Get:" in bold
-      document.execCommand('bold', false, null);
-      document.execCommand('insertText', false, 'What You Get:');
-      document.execCommand('bold', false, null);
-      document.execCommand('insertParagraph', false, null);
-      await sleep(rand(60, 100));
+      // "What You Get:" — bold via toolbar click
+      qlBold()?.click(); await sleep(60);
+      insert('What You Get:');
+      qlBold()?.click(); await sleep(60);
+      newLine();
 
-      // Bullet list
-      document.execCommand('insertUnorderedList', false, null);
-      await sleep(rand(60, 100));
+      // Bullet list via toolbar click
+      qlBullet()?.click(); await sleep(100);
       for (const bullet of desc.bullets) {
-        document.execCommand('insertText', false, bullet);
-        await sleep(rand(40, 80));
-        document.execCommand('insertParagraph', false, null);
-        await sleep(rand(40, 80));
+        insert(bullet);
+        await sleep(rand(40, 70));
+        newLine();
+        await sleep(rand(30, 60));
       }
-      // Exit list
-      document.execCommand('insertUnorderedList', false, null);
-      await sleep(rand(60, 100));
-      document.execCommand('insertParagraph', false, null);
+      // Exit bullet list
+      qlBullet()?.click(); await sleep(80);
+      newLine();
 
-      // "Why Choose Me:" in bold
-      document.execCommand('bold', false, null);
-      document.execCommand('insertText', false, 'Why Choose Me:');
-      document.execCommand('bold', false, null);
-      document.execCommand('insertParagraph', false, null);
-      document.execCommand('insertText', false, desc.why);
-      document.execCommand('insertParagraph', false, null);
-      document.execCommand('insertParagraph', false, null);
+      // "Why Choose Me:" — bold via toolbar click
+      qlBold()?.click(); await sleep(60);
+      insert('Why Choose Me:');
+      qlBold()?.click(); await sleep(60);
+      newLine();
+      insert(desc.why);
+      newLine(); newLine();
       await sleep(rand(60, 100));
 
       // CTA
-      document.execCommand('insertText', false, desc.cta);
+      insert(desc.cta);
       await sleep(rand(80, 140));
 
       setMsg('Description filled!', 'success');
