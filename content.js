@@ -366,57 +366,29 @@ JSON only.`
           .slice(0, 3);
       }
 
-      // Call React's own onClick/onMouseDown handler directly via fiber props
-      function reactClick(el) {
-        for (let node = el; node; node = node.parentElement) {
-          const propsKey = Object.keys(node).find(k => /^__reactProps\$/.test(k));
-          if (!propsKey) continue;
-          const props = node[propsKey];
-          const handler = props.onClick || props.onMouseDown || props.onMouseUp;
-          if (!handler) continue;
-          const r = el.getBoundingClientRect();
-          handler({
-            preventDefault: () => {}, stopPropagation: () => {},
-            target: el, currentTarget: node, button: 0, buttons: 1,
-            clientX: r.left + r.width / 2, clientY: r.top + r.height / 2,
-            nativeEvent: new MouseEvent('click', { bubbles: true })
-          });
-          return true;
-        }
-        return false;
-      }
-
       async function selectDelivery(colIndex, days) {
         const triggers = findDeliveryTriggers();
         const trigger = triggers[colIndex];
-        console.log('[FAI] delivery trigger['+colIndex+']:', trigger?.tagName, JSON.stringify(trigger?.textContent?.trim()?.slice(0,30)));
         if (!trigger) return;
 
-        if (!reactClick(trigger)) trigger.click();
+        trigger.click();
         await sleep(rand(1400, 1800));
 
         const label = days === 1 ? '1 DAY DELIVERY' : `${days} DAYS DELIVERY`;
         const normalize = t => t.replace(/\s+/g, ' ').trim().toUpperCase();
-        const allCands = [...document.querySelectorAll('li, [role="option"], div, span, p')]
-          .filter(el => el.getBoundingClientRect().width > 0);
-        const opt = allCands.find(el => normalize(el.textContent) === label);
 
-        console.log('[FAI] label:', label, '| opt:', opt?.tagName, JSON.stringify(opt?.textContent?.trim()?.slice(0,30)));
-        console.log('[FAI] DELIVERY items:', allCands.filter(el => normalize(el.textContent).includes('DELIVERY')).map(el => normalize(el.textContent).slice(0,30)).slice(0,10).join(' | '));
+        // Find the deepest element whose full text matches the label
+        const candidates = [...document.querySelectorAll('li, [role="option"], [role="listbox"] > *, div, span')]
+          .filter(el => {
+            const r = el.getBoundingClientRect();
+            return r.width > 0 && r.height > 0;
+          });
+        const opt = candidates.find(el => normalize(el.textContent) === label);
 
         if (opt) {
-          const handled = reactClick(opt);
-          console.log('[FAI] reactClick handled:', handled);
-          if (!handled) {
-            const or = opt.getBoundingClientRect();
-            const cx = or.left + or.width / 2, cy = or.top + or.height / 2;
-            const oev = { bubbles: true, cancelable: true, view: window, clientX: cx, clientY: cy };
-            opt.dispatchEvent(new PointerEvent('pointerdown', oev));
-            opt.dispatchEvent(new MouseEvent('mousedown', oev));
-            opt.dispatchEvent(new PointerEvent('pointerup', oev));
-            opt.dispatchEvent(new MouseEvent('mouseup', oev));
-            opt.dispatchEvent(new MouseEvent('click', oev));
-          }
+          opt.scrollIntoView({ block: 'nearest' });
+          await sleep(80);
+          opt.click();
           await sleep(rand(400, 600));
         }
       }
