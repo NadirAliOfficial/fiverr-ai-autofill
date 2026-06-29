@@ -335,9 +335,10 @@ function injectPage2() {
   "premium":  { "name": "UNIQUE_NAME_3", "description": "...", "price": 150 }
 }
 Rules:
-- Names: creative, unique, tier-appropriate names (NOT Basic/Standard/Premium). Examples: Starter, Growth, Pro, Elite, Essential, Advanced, Ultimate, Lite, Plus, Enterprise. Each must be different.
-- Description: under 90 characters, one clear sentence, mention what is included, naturally use keywords from: ${kw}.
-- Prices realistic for the gig type.
+- Names: creative tier-appropriate names (NOT Basic/Standard/Premium). E.g. Starter, Growth, Pro, Elite, Essential, Advanced, Ultimate. Each must be DIFFERENT.
+- Description: exactly one sentence, 120-145 characters, SPECIFIC to ${kw}. State clearly what the buyer gets — tools used, scope, deliverable format. No filler phrases like "perfect for businesses".
+- Prices: realistic for the gig type and tier (basic cheapest, premium highest).
+- Escalate scope between tiers: basic = minimal, standard = full, premium = everything + extras.
 JSON only.`
       );
 
@@ -360,7 +361,7 @@ JSON only.`
         if (!pkg) continue;
         setMsg(`Filling ${tiers[i]}…`, 'info');
         if (freshNames[i]) { await humanType(freshNames[i], pkg.name); await humanDelay(); }
-        if (freshDescs[i]) { await humanType(freshDescs[i], pkg.description.trim().slice(0, 89)); await humanDelay(); }
+        if (freshDescs[i]) { await humanType(freshDescs[i], pkg.description.trim().slice(0, 145)); await humanDelay(); }
         if (priceInputs[i]) { await humanType(priceInputs[i], String(pkg.price)); await humanDelay(); }
       }
       setMsg('Packages done — set Delivery Time manually', 'success');
@@ -457,15 +458,15 @@ Rules:
 
       // Bullet list via toolbar click
       qlBullet()?.click(); await sleep(100);
-      for (const bullet of desc.bullets) {
-        insert(bullet);
+      for (let bi = 0; bi < desc.bullets.length; bi++) {
+        insert(desc.bullets[bi]);
         await sleep(rand(40, 70));
-        newLine();
-        await sleep(rand(30, 60));
+        // Only add newline between items — not after the last one
+        if (bi < desc.bullets.length - 1) { newLine(); await sleep(rand(30, 60)); }
       }
-      // Exit bullet list
+      // Exit list: click bullet to toggle off (cursor is at end of last item, not on empty line)
       qlBullet()?.click(); await sleep(80);
-      newLine();
+      newLine(); newLine();
 
       // "Why Choose Me:" — bold via toolbar click
       qlBold()?.click(); await sleep(60);
@@ -513,11 +514,10 @@ Return ONLY valid JSON array:
   { "question": "...", "answer": "..." }
 ]
 STRICT RULES:
-- NEVER mention email, phone, WhatsApp, Telegram, Skype, or any contact outside Fiverr — this violates Fiverr TOS.
-- All communication happens through Fiverr only.
-- Questions must be phrased as a buyer asking a seller — natural and conversational.
-- Answers: minimum one full sentence, under 265 characters, specific to: ${kw}.
-- Include relevant keywords from (${kw}) naturally in 2-3 answers.
+- NEVER mention email, phone, WhatsApp, Telegram, Skype or any outside contact — Fiverr TOS violation.
+- Questions: natural, conversational, phrased as buyer asking seller.
+- Answers: 2-3 sentences, SPECIFIC to ${kw}, use 220-260 characters. Include real details — tools, timelines, formats, numbers. No vague filler like "it depends" or "great results".
+- Weave keywords from (${kw}) naturally into 2-3 answers.
 JSON only, no markdown.`
       );
       let faqs;
