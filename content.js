@@ -355,6 +355,49 @@ JSON only.`
 
       if (!freshNames.length) throw new Error('Package fields not found — scroll to the pricing table first');
 
+      const deliveryDays = [3, 6, 9]; // basic, standard, premium
+
+      // Find deepest visible element whose full trimmed text is "N Day(s)"
+      function findDeliveryTriggers() {
+        const candidates = [...document.querySelectorAll('div, button, span, p')]
+          .filter(el => isVisible(el) && /^\d+\s+days?$/i.test(el.textContent.trim()));
+        // Keep only deepest (no child matching same pattern) — avoid wrapping ancestors
+        return candidates
+          .filter(el => !candidates.some(o => o !== el && el.contains(o)))
+          .slice(0, 3);
+      }
+
+      async function selectDelivery(colIndex, days) {
+        const triggers = findDeliveryTriggers();
+        const trigger = triggers[colIndex];
+        if (!trigger) return;
+
+        const r = trigger.getBoundingClientRect();
+        const ev = { bubbles: true, cancelable: true, view: window,
+          clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 };
+        trigger.dispatchEvent(new MouseEvent('mousedown', ev));
+        trigger.dispatchEvent(new MouseEvent('mouseup', ev));
+        trigger.click();
+        await sleep(rand(600, 900));
+
+        // Snapshot existing day-text elements so we only look at NEW ones (portal items)
+        const target = new RegExp(`^${days}\\s+days?$`, 'i');
+        const allDayEls = [...document.querySelectorAll('div, li, span, p, [role="option"]')]
+          .filter(el => isVisible(el) && target.test(el.textContent.trim()));
+
+        // Prefer elements that aren't the trigger itself
+        const opt = allDayEls.find(el => !el.isSameNode(trigger) && !el.contains(trigger));
+        if (opt) {
+          const or = opt.getBoundingClientRect();
+          const oev = { bubbles: true, cancelable: true, view: window,
+            clientX: or.left + or.width / 2, clientY: or.top + or.height / 2 };
+          opt.dispatchEvent(new MouseEvent('mousedown', oev));
+          opt.dispatchEvent(new MouseEvent('mouseup', oev));
+          opt.click();
+          await sleep(rand(400, 600));
+        }
+      }
+
       const tiers = ['basic', 'standard', 'premium'];
       for (let i = 0; i < 3; i++) {
         const pkg = pkgs[tiers[i]];
@@ -363,8 +406,9 @@ JSON only.`
         if (freshNames[i]) { await humanType(freshNames[i], pkg.name); await humanDelay(); }
         if (freshDescs[i]) { await humanType(freshDescs[i], pkg.description.trim().slice(0, 145)); await humanDelay(); }
         if (priceInputs[i]) { await humanType(priceInputs[i], String(pkg.price)); await humanDelay(); }
+        await selectDelivery(i, deliveryDays[i]);
       }
-      setMsg('Packages done — set Delivery Time manually', 'success');
+      setMsg('Packages done!', 'success');
     });
     anchor.before(btn);
   }
