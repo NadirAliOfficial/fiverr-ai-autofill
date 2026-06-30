@@ -413,12 +413,12 @@ function injectPage3() {
   "cta": "..."
 }
 Rules:
-- hook: 4 full sentences, 350-420 chars. Cover what the gig delivers, the value to the buyer, your expertise, and what sets you apart.
+- hook: ONE short punchy sentence, max 100 chars. A tagline that grabs attention. No "I will".
 - bullets: exactly 6 items. Each is 10-14 words describing a specific deliverable or service. No duplicates.
-- why: 4 full sentences, 350-420 chars. Cover your experience, turnaround speed, quality standards, revision policy, and post-delivery support.
+- why: 4 full sentences, 380-450 chars. Cover years of experience, turnaround speed, quality standards, revision policy, and post-delivery support. Be specific and detailed.
 - cta: one direct sentence urging the buyer to order, 70-90 chars.
 - Weave keywords naturally: ${kw}
-- CRITICAL: hook must be 350+ chars. why must be 350+ chars. Total must exceed 1100 chars. Write LONG, detailed sentences.
+- CRITICAL: why must be 380+ chars with detailed specifics. Write LONG detailed sentences for why only.
 - Output JSON only, no markdown, no char counts.`
       );
 
