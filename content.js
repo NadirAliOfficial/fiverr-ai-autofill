@@ -413,12 +413,12 @@ function injectPage3() {
   "cta": "..."
 }
 Rules:
-- hook: 3 full sentences about the value and outcome of this gig. 280-320 chars.
-- bullets: exactly 6 items. Each is a specific deliverable, 8-12 words, no emoji.
-- why: 3 full sentences about experience, turnaround, quality, and support. 280-320 chars.
-- cta: one direct call-to-action sentence urging the buyer to hire. 70-90 chars.
+- hook: EXACTLY 3 sentences, 250-300 chars. Talk about value, outcome, and what makes this gig stand out.
+- bullets: exactly 6 items. Each bullet is 8-12 words describing a specific deliverable or service included.
+- why: EXACTLY 3 sentences, 250-300 chars. Cover your experience level, turnaround speed, quality standards, and after-delivery support.
+- cta: one imperative sentence urging the buyer to hire you, 70-90 chars.
 - Weave keywords naturally: ${kw}
-- Total combined length must be 900-1000 characters. Write FULL sentences — no fragments.
+- CRITICAL: hook alone must be 250+ chars. why alone must be 250+ chars. Do NOT write short sentences.
 - Output JSON only, no markdown, no char counts.`
       );
 
@@ -459,15 +459,12 @@ Rules:
       qlBold()?.click(); await sleep(60);
       newLine();
 
-      // Bullet list via toolbar click
-      qlBullet()?.click(); await sleep(200);
+      // Bullets as plain text with • prefix — avoids Quill list cursor issues
       for (let bi = 0; bi < desc.bullets.length; bi++) {
-        insert(desc.bullets[bi]);
+        insert('• ' + desc.bullets[bi]);
         await sleep(rand(40, 70));
         newLine(); await sleep(rand(30, 60));
       }
-      // Cursor is now on a new empty list item — exit list from there
-      qlBullet()?.click(); await sleep(80);
       newLine();
 
       // "Why Choose Me:" — bold via toolbar click
