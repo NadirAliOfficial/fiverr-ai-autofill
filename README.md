@@ -4,7 +4,7 @@ A Chrome extension that uses **Groq AI** to generate and autofill your entire Fi
 
 ![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-green?style=for-the-badge)
-![Groq AI](https://img.shields.io/badge/Groq-llama--3.3--70b-orange?style=for-the-badge)
+![Groq AI](https://img.shields.io/badge/Groq-gpt--oss--120b-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
 ---
@@ -120,7 +120,7 @@ User fills niche bar on gig page (or profile niche in popup)
         ↓
 content.js builds prompt with niche + profile info (name, years, country)
         ↓
-background.js calls Groq API (llama-3.3-70b-versatile)
+background.js calls Groq API (openai/gpt-oss-120b)
         ↓
 Response is typed character-by-character into Fiverr's fields
 using React-compatible events (nativeInputValueSetter + InputEvent),
@@ -135,7 +135,7 @@ so Fiverr registers it as real user input
 | Layer | Tech |
 |---|---|
 | Extension | Chrome MV3, Vanilla JS |
-| AI | Groq Cloud — `llama-3.3-70b-versatile` |
+| AI | Groq Cloud — `openai/gpt-oss-120b` |
 | Storage | `chrome.storage.sync` (keys/model) + `chrome.storage.local` (profile/skills) |
 | Skill data | Fiverr autocomplete API (pre-fetched, bundled as JSON) |
 
