@@ -93,8 +93,16 @@ document.getElementById('faiEnabled').addEventListener('change', function () {
 
 // Save API keys
 document.getElementById('saveKeys').addEventListener('click', () => {
+  // Strip anything outside printable ASCII — pasting from WhatsApp/chat apps can
+  // silently inject invisible Unicode formatting characters that break the
+  // Authorization header (fetch throws "non ISO-8859-1 code point").
   const keys = ['k1', 'k2', 'k3']
-    .map(id => document.getElementById(id).value.trim())
+    .map(id => {
+      const el = document.getElementById(id);
+      const clean = el.value.replace(/[^\x20-\x7E]/g, '').trim();
+      el.value = clean;
+      return clean;
+    })
     .filter(Boolean);
   if (!keys.length) { toast('Enter at least one API key', true); return; }
   chrome.storage.sync.set({ groqKeys: keys, groqApiKey: keys[0] }, () => toast('◆ Keys saved'));
@@ -103,7 +111,7 @@ document.getElementById('saveKeys').addEventListener('click', () => {
 // Test connection
 document.getElementById('testBtn').addEventListener('click', async () => {
   const keys = ['k1', 'k2', 'k3']
-    .map(id => document.getElementById(id).value.trim())
+    .map(id => document.getElementById(id).value.replace(/[^\x20-\x7E]/g, '').trim())
     .filter(Boolean);
   if (!keys.length) { toast('Enter an API key first', true); return; }
   document.getElementById('testBtn').textContent = '…';
