@@ -25,6 +25,7 @@ async function callWithKey(apiKey, prompt, systemPrompt, model, temperature) {
     body: JSON.stringify({
       model: model || DEFAULT_MODEL,
       temperature: temperature ?? 0.7,
+      reasoning_effort: 'low', // GPT-OSS reasoning tokens count against max_tokens — keep low for faster, cheaper generations
       max_tokens: 8000,
       messages: [
         { role: 'system', content: systemPrompt },
