@@ -134,6 +134,19 @@ function isVisible(el) {
   return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
 }
 
+// AI output sometimes title-cases acronyms into a broken half-capitalized form
+// (e.g. "Eas", "Apis") instead of the correct "EAs", "APIs" — fix deterministically
+// since prompt instructions alone aren't reliable enough for this.
+function fixAcronyms(text) {
+  const acronyms = ['EA', 'API', 'MT4', 'MT5', 'AI', 'UI', 'UX', 'SEO', 'CRM', 'CSV', 'PDF'];
+  let fixed = text;
+  for (const a of acronyms) {
+    fixed = fixed.replace(new RegExp(`\\b${a}s\\b`, 'gi'), `${a}s`);
+    fixed = fixed.replace(new RegExp(`\\b${a}\\b`, 'gi'), a);
+  }
+  return fixed;
+}
+
 async function ask(prompt, system, temperature) {
   const res = await chrome.runtime.sendMessage({
     type: 'GROQ_REQUEST',
@@ -295,10 +308,12 @@ Max 60 chars. Naturally include 1-2 of these keywords: ${kw}.
 ${angle}
 Be specific and punchy: service + tool/platform + outcome. No filler words.
 Avoid defaulting to the most generic, expected phrasing — this must read differently from a typical templated gig title.
+NEVER mention or imply profits, earnings, returns, ROI, "guaranteed", "passive income", or any financial results — Fiverr bans income/profit guarantee claims in gig titles, especially for trading/finance gigs. Focus only on the service and deliverable, not money outcomes.
+Preserve correct capitalization of technical acronyms exactly as written (EA, API, MT5, MT4, AI, etc.) — plural form adds a lowercase "s" with no case change, e.g. "EAs" not "Eas", "APIs" not "Apis".
 Reply with ONLY the text, no quotes.`,
         1.0
       );
-      const clean = text.replace(/^["']|["']$/g, '').trim().replace(/^i will\s+/i, '').trim();
+      const clean = fixAcronyms(text.replace(/^["']|["']$/g, '').trim().replace(/^i will\s+/i, '').trim());
       await humanType(titleEl, clean.slice(0, 73));
       setMsg('Title filled!', 'success');
     });
