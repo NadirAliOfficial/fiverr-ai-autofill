@@ -26,7 +26,10 @@ async function callWithKey(apiKey, prompt, systemPrompt, model, temperature) {
       model: model || DEFAULT_MODEL,
       temperature: temperature ?? 0.7,
       reasoning_effort: 'low', // GPT-OSS reasoning tokens count against max_tokens — keep low for faster, cheaper generations
-      max_tokens: 8000,
+      // Free tier caps openai/gpt-oss-120b at 8K tokens PER MINUTE — requesting max_tokens
+      // anywhere near that on a single call gets rejected as "too large" outright, even
+      // for a tiny title. None of our generations need more than ~500 tokens of output.
+      max_tokens: 1500,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt }
